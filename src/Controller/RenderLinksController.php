@@ -8,11 +8,13 @@ use RcmDynamicNavigation\Api\Acl\IsAllowedAdmin;
 use RcmDynamicNavigation\Api\LinksFromData;
 use RcmDynamicNavigation\Api\Render\RenderLinks;
 use Zend\Diactoros\Response\JsonResponse;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use Interop\Http\ServerMiddleware\DelegateInterface;
 
 /**
  * @author James Jervis - https://github.com/jerv13
  */
-class RenderLinksController
+class RenderLinksController implements MiddlewareInterface
 {
     protected $isAllowedAdmin;
     protected $renderLinks;
@@ -31,18 +33,16 @@ class RenderLinksController
     }
 
     /**
-     * __invoke
+     * process
      *
      * @param ServerRequestInterface $request
-     * @param ResponseInterface      $response
-     * @param callable|null          $next
+     * @param DelegateInterface|null $delegate
      *
      * @return mixed
      */
-    public function __invoke(
+    public function process(
         ServerRequestInterface $request,
-        ResponseInterface $response,
-        callable $next = null
+        DelegateInterface $delegate = null
     ) {
         if (!$this->isAllowedAdmin->__invoke($request, [])) {
             new JsonResponse(

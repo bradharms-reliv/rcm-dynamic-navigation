@@ -8,11 +8,13 @@ use RcmDynamicNavigation\Api\Acl\IsAllowedAdmin;
 use RcmDynamicNavigation\Api\GetIsAllowedServicesConfig;
 use RcmDynamicNavigation\Api\GetRenderServicesConfig;
 use Zend\Diactoros\Response\JsonResponse;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use Interop\Http\ServerMiddleware\DelegateInterface;
 
 /**
  * @author James Jervis - https://github.com/jerv13
  */
-class ApiAdminController
+class ApiAdminController implements MiddlewareInterface
 {
     protected $isAllowedAdmin;
     protected $getRenderServicesConfig;
@@ -38,15 +40,13 @@ class ApiAdminController
      * __invoke
      *
      * @param ServerRequestInterface $request
-     * @param ResponseInterface      $response
-     * @param callable|null          $next
+     * @param DelegateInterface|null $delegate
      *
      * @return mixed
      */
-    public function __invoke(
+    public function process(
         ServerRequestInterface $request,
-        ResponseInterface $response,
-        callable $next = null
+        DelegateInterface $delegate = null
     ) {
         if (!$this->isAllowedAdmin->__invoke($request, [])) {
             new JsonResponse(
